@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chicago Crime Data</title>
+<link href="assignment2.css" rel="stylesheet" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"> </script>
+<script>
+
+var pagesize=4;
+var currentPagenumber=1;
+var startid=0;
+var endid=currentPagenumber*pagesize;
+var totalpagenumbers;
+var objData;
+$(document).ready(function (){
+$.getJSON("crimes.json", function (jsonData)
+{
+  objData=jsonData;
+  if(objData !=undefined)
+  {
+    totalpagenumbers=Math.ceil(objData.length / pagesize);
+    bindata(currentPagenumber);
+  }
+});
+});
+function bindata(pageno)
+{
+
+  var currentPagenumber=pageno;
+  endid=(currentPagenumber*pagesize);
+  startid=endid-pagesize;
+  totalpagenumbers=Math.ceil(objData.length / pagesize);
+
+    $('#tabdynamic').html("");
+  $('#tabdynamic').append('<table></table>');
+   var tr=$('#tabdynamic').children();
+   tr.append("<tr><th>YEAR</th><th>UNDER $500</th><th>ABOVE $500</th><th>Remove Data</th></tr>")
+  if (endid>objData.length)
+  endid=objData.length;
+   for(i=startid;i<endid;i++)
+   {
+     tr.append("<tr><td>"+objData[i].year+"</td><td>"+objData[i].under_500+"</td><td>"+objData[i].above_500+"</td><td><button onclick=\"deletes("+i+")\">Delete</button></td></tr>");
+ }
+ $('#buttons').html("");
+ for(i=0;i<totalpagenumbers;i++)
+ {
+   $('#buttons').append('<button type="button" class="btn btn-secondary" onclick="bindata('+ (i+1) +')">'+ (i+1) + '</button>');
+ }
+
+ }
+ function addRecord(){
+
+   var year = document.getElementById("textbox").value;
+   var above_500 = document.getElementById("textbox1").value;
+   var under_500 = document.getElementById("textbox2").value;
+   var newData={};
+   newData["year"]=year;
+   newData["under_500"]=under_500;
+   newData["above_500"]=above_500;
+   objData.push(newData);
+   console.log(objData);
+   bindata(currentPagenumber);
+
+ }
+ function deletes(i){
+   //console.log(i);
+   for(var k=i;k<objData.length-1;k++){
+     objData[k].year=objData[k+1].year;
+     objData[k].over_500=objData[k+1].over_500;
+     objData[k].under_500=objData[k+1].under_500;
+   }
+ objData.pop();
+ bindata(currentPagenumber);
+ }
+</script>
+</head>
+<body>
+
+<h1 id="text"> Chicago Crime Data</h1>
+<center><div id="tabdynamic"></center>
+  <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups" style="margin-left:600px; margin-top:30px">
+    <div class="btn-group"  role="group" aria-label="First group" id="buttons"></div>
+    </div>
+</div><br>
+<center><div>
+<h2 id="text">Add More Record</h2>
+<form> <div>
+    <label id="color" for="year">&nbsp&nbspEnter Year :</label>
+    <input type="text" id="textbox" placeholder="Year of Theft">
+  </div><br>
+  <div>
+    <label  id="color" for="above_500">Above $500 :</label>
+    <input type="text" class="textbox" id="textbox1" placeholder="value of above $500">
+  </div><br>
+  <div>
+    <label id="color" for="under_500">Under $500 :</label>
+    <input type="text" class="form-control"  class="textbox" id="textbox2" placeholder="value of under $500">
+  </div><br>
+  <input type="button" value="ADD" onclick="addRecord()"/></form></div></center>
+</body>
+</html>
